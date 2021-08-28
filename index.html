@@ -4,9 +4,36 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <script src="scripts/app.js" charset="utf-8"></script>
+  <title>Battleships</title>
 </head>
 <body>
-  <h1>project 1</h1>
+  <header>
+    <h1>BATTLESHIPS</h1>
+  </header>
+  <div class="grid-wrapper">
+    <div class="player-grid"><!-- player cells go in here --></div>
+    <div class='playerScore'>
+      <h4>Scoreboard</h4>
+      <ul>
+        <li>Current Score: <span id="current-score"></span></li>
+        <li>Space Occupied: <span id="space-occupied"></span></li>
+        <li>Ships Remaining: <span id="ships-remaining"></span></li>
+        <li>Total Shots Taken: <span id="total-shots"></span></li>
+      </ul>
+      <button id="rotate-btn">Rotate</button> <!-- appear upon ship select, disappear when game starts -->
+    </div>
+    <div class="computer-grid"><!-- computer board cells go here --></div>
+  </div>
+  <div class="ship-placement">
+    <h5>Select your ships</h5>
+    <button class="ship-btn" id="ship">Ship 1</button>
+    <button class="ship-btn" id="ship2">Ship 2</button>
+    <button class="ship-btn" id='ship3'>Ship 3</button>
+    <button class="ship-btn" id="ship4">Ship 4</button>
+    <button class="ship-btn" id="ship5">Ship 5</button>
+  </div>
 </body>
+<!-- add audio tags when ready -> avengers assemble -->
 </html>
