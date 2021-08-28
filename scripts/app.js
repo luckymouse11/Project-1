@@ -5,6 +5,7 @@ function init() {
   const playerGrid = document.querySelector('.player-grid')
   const computerGrid = document.querySelector('.computer-grid')
   const shipButtons = document.querySelectorAll('.ship-btn')
+  const rotateBtn = document.getElementById('rotate-btn')
 
 
   // VARIABLES
@@ -20,10 +21,16 @@ function init() {
   let isVertical = false
 
   const ship = 'ship'                       // css class for the pieces
-  const shipSizes = [5, 4, 3, 3, 2]         // ship size (how many divs each take)
+  const shipSizes = {                       // ship size (how many divs each take)
+    'Ship 1': 5,
+    'Ship 2': 4,
+    'Ship 3': 3, 
+    'Ship 4': 3,
+    'Ship 5': 2
+  }
   const startingPosition = 0                // cell starting position (where boat appears first)
   let currentPosition = startingPosition    // current position which is updated on every move //shouldnt need this
-
+  let currentShipSize = 0
 
   let playerSpaceOccupied                   // counter for space occupied on player board - if time, can create for total number of ships
   let computerSpaceOccupied                 // counter for space occupied on computer board
@@ -49,10 +56,14 @@ function init() {
     }
   }
 
+
+
   function startGameScreen() {
     // display none -> remove intro page
     // when button clicked, display none
   }
+
+
 
   function addShip(cellPosition, shipSize, isVertical){
     if (isVertical === true){
@@ -66,7 +77,6 @@ function init() {
     }
   }
   // click to add ship -> change cursor
-  // click to rotate when placing ship
   // click to place ship -> use array to store ships position
 
   function removeShip(cellPosition, shipSize, isVertical){
@@ -80,41 +90,68 @@ function init() {
       }
     }
   }
-  // when all ships have been added 
 
-
-
-  // Key movement
-  // rotate ship
-  function handleKeyDown(event){
-    removeShip(currentPosition)
-
-    const key = event.keyCode
-
-    console.log(event.keyCode)
-    if (key === right && currentPosition % width !== width - 1){
-      currentPosition++
-    } else if (key === left && currentPosition % width !== 0){
-      currentPosition--
-    } else if (key === up && currentPosition >= width){
-      currentPosition -= width
-    } else if (key === down && currentPosition + width <= cellCount - 1){
-      currentPosition += width
+  // Rotation
+  function rotate(){
+    removeShip(currentPosition, currentShipSize, isVertical)
+    if (isVertical === true){
+      isVertical = false
     } else {
-      console.log('INVALID KEY')
+      isVertical = true
     }
-    console.log('current position ->',currentPosition)
-    addShip(currentPosition)
+    addShip(currentPosition, currentShipSize, isVertical)
   }
 
+  // Key movement
+  function handleKeyDown(event){
+    removeShip(currentPosition, currentShipSize, isVertical)
+
+    const key = event.keyCode
+    console.log(event.keyCode)
+
+    if (isVertical === false){
+      if (key === right && (currentPosition + currentShipSize - 1) % width !== width - 1){
+        currentPosition++
+      } else if (key === left && currentPosition % width !== 0){
+        currentPosition--
+      } else if (key === up && currentPosition >= width){
+        currentPosition -= width
+      } else if (key === down && currentPosition + width <= cellCount - 1){
+        currentPosition += width
+      } else {
+        console.log('INVALID KEY')
+      }
+      console.log('current position ->',currentPosition)
+      addShip(currentPosition, currentShipSize, isVertical)
+    } else {
+      if (key === right && currentPosition % width !== width - 1){
+        currentPosition++
+      } else if (key === left && currentPosition % width !== 0){
+        currentPosition--
+      } else if (key === up && currentPosition >= width){
+        currentPosition -= width
+      } else if (key === down && (currentPosition + ((currentShipSize - 1) * 10)) + width <= cellCount - 1){
+        currentPosition += width
+      } else {
+        console.log('INVALID KEY')
+      }
+      console.log('current position ->',currentPosition)
+      addShip(currentPosition, currentShipSize, isVertical)
+    }
+  } 
 
   // Setting ship position
   function setShipPosition(event){
-    addShip(startingPosition)
+    currentShipSize = shipSizes[event.target.innerText]
+    addShip(startingPosition, currentShipSize, isVertical)
     document.addEventListener('keydown', handleKeyDown)
+    // function to confirm position
   }
 
-
+  // function to reset the board
+  function reset(event){
+    
+  }
 
 
 
@@ -158,6 +195,7 @@ function gameOver(){
 
   createGrid(startingPosition)
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
+  rotateBtn.addEventListener('click', rotate)
 
 
 }
