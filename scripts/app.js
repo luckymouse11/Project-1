@@ -6,6 +6,7 @@ function init() {
   const computerGrid = document.querySelector('.computer-grid')
   const shipButtons = document.querySelectorAll('.ship-btn')
   const rotateBtn = document.getElementById('rotate-btn')
+  const setPositionBtn = document.getElementById('set-position-btn')
 
 
   // VARIABLES
@@ -22,9 +23,9 @@ function init() {
 
   const ship = 'ship'                       // css class for the pieces
   const shipSizes = {                       // ship size (how many divs each take)
-    'Ship 1': 5,
-    'Ship 2': 4,
-    'Ship 3': 3, 
+    'Ship 1': 6,
+    'Ship 2': 5,
+    'Ship 3': 4, 
     'Ship 4': 3,
     'Ship 5': 2
   }
@@ -70,10 +71,12 @@ function init() {
       for (let i = cellPosition; i <= cellPosition + width * (shipSize - 1); i += width){
         playerBoard[i].classList.add(ship)
       }  
-    } else { 
+    } else if (isVertical !== true){ 
       for (let i = cellPosition; i < cellPosition + shipSize; i++){
         playerBoard[i].classList.add(ship)
       }
+    } else {
+      console.log('INVALID KEY')
     }
   }
   // click to add ship -> change cursor
@@ -94,11 +97,22 @@ function init() {
   // Rotation
   function rotate(){
     removeShip(currentPosition, currentShipSize, isVertical)
+    const remainder = currentPosition % width
+    const rotationLimit = width - currentShipSize
+
+    // ensure that ship does not rotate outside of board
     if (isVertical === true){
       isVertical = false
+      if (remainder > rotationLimit){
+        currentPosition = currentPosition - remainder + rotationLimit
+      }
     } else {
       isVertical = true
+      if (currentPosition >= (rotationLimit + 1) * width){
+        currentPosition = rotationLimit * width + remainder
+      }
     }
+
     addShip(currentPosition, currentShipSize, isVertical)
   }
 
@@ -140,17 +154,20 @@ function init() {
     }
   } 
 
-  // Setting ship position
+  // adjust ship position
   function setShipPosition(event){
+    removeShip(currentPosition, currentShipSize, isVertical)
     currentShipSize = shipSizes[event.target.innerText]
-    addShip(startingPosition, currentShipSize, isVertical)
+    addShip(currentPosition, currentShipSize, isVertical)
     document.addEventListener('keydown', handleKeyDown)
     // function to confirm position
   }
 
+
+
   // function to reset the board
   function reset(event){
-    
+
   }
 
 
@@ -196,7 +213,6 @@ function gameOver(){
   createGrid(startingPosition)
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   rotateBtn.addEventListener('click', rotate)
-
 
 }
 
