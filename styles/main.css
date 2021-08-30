@@ -35,7 +35,7 @@ body{
   align-content: center;
   background-color: rgb(47, 216, 188);
   opacity: 0.7;
-  color: transparent;
+  /* color: transparent; */
 
 }
 
@@ -83,14 +83,22 @@ button{
   margin: 10px 0;
 }
 
-.ship{
-  background-color: red;
-}
-
 .ship-in-position{
   background-color: purple;
 }
 
+.ship{
+  background-color: red;
+}
+
 .button-disappear{
   display: none;
+}
+
+#rotate-btn{
+  background-color: green;
+}
+
+.start-button{
+  background-color: red;
 }
