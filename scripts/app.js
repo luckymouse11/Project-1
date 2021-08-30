@@ -18,10 +18,11 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
+  const shipCoordinates = []
 
-  let isVertical = false
-
+  const shipInPosition = 'ship-in-position' // css class for ship set in position
   const ship = 'ship'                       // css class for the pieces
+  const shipDisappear = 'button-disappear'
   const shipSizes = {                       // ship size (how many divs each take)
     'Ship 1': 6,
     'Ship 2': 5,
@@ -30,14 +31,15 @@ function init() {
     'Ship 5': 2
   }
   const startingPosition = 0                // cell starting position (where boat appears first)
+  let isVertical = false
   let currentPosition = startingPosition    // current position which is updated on every move //shouldnt need this
   let currentShipSize = 0
-
-  let playerSpaceOccupied                   // counter for space occupied on player board - if time, can create for total number of ships
+  let currentShipButton 
+  let playerSpaceOccupied = 0 //number      // counter for space occupied on player board - if time, can create for total number of ships
   let computerSpaceOccupied                 // counter for space occupied on computer board
-  let pSpaceHit                             // counter for ships that have been hit
-  let cSpaceHit                             // counter for enemy ships remaining
-  let totalShots                            // counter for shots taken
+  let playerSpaceHit                        // counter for ships that have been hit
+  let computerSpaceHit                      // counter for enemy ships remaining
+  let totalShotsTaken                       // counter for shots taken
 
 
   // EXECUTION
@@ -59,6 +61,7 @@ function init() {
 
 
 
+
   function startGameScreen() {
     // display none -> remove intro page
     // when button clicked, display none
@@ -66,20 +69,27 @@ function init() {
 
 
 
-  function addShip(cellPosition, shipSize, isVertical){
+  function addShip(cellPosition, shipSize, isVertical, save = false){
+    let shipClass = ship
+    const singleShipCoordinates = []
+    if (save === true){
+      shipClass = shipInPosition
+    }
     if (isVertical === true){
       for (let i = cellPosition; i <= cellPosition + width * (shipSize - 1); i += width){
-        playerBoard[i].classList.add(ship)
+        playerBoard[i].classList.add(shipClass)
+        singleShipCoordinates.push(i)
       }  
     } else if (isVertical !== true){ 
       for (let i = cellPosition; i < cellPosition + shipSize; i++){
-        playerBoard[i].classList.add(ship)
+        playerBoard[i].classList.add(shipClass)
+        singleShipCoordinates.push(i)
       }
-    } else {
-      console.log('INVALID KEY')
+    }
+    if (save === true){
+      shipCoordinates.push(singleShipCoordinates)
     }
   }
-  // click to add ship -> change cursor
   // click to place ship -> use array to store ships position
 
   function removeShip(cellPosition, shipSize, isVertical){
@@ -154,14 +164,25 @@ function init() {
     }
   } 
 
-  // adjust ship position
+
+  // adjust ship position -> set ship position
   function setShipPosition(event){
+    currentShipButton = event.target
     removeShip(currentPosition, currentShipSize, isVertical)
     currentShipSize = shipSizes[event.target.innerText]
+    currentPosition = startingPosition
     addShip(currentPosition, currentShipSize, isVertical)
     document.addEventListener('keydown', handleKeyDown)
-    // function to confirm position
   }
+
+  function saveShipPosition(event){
+    addShip(currentPosition, currentShipSize, isVertical, true)
+    document.removeEventListener('keydown', handleKeyDown)
+    currentShipButton.classList.add(shipDisappear)
+  }
+
+
+
 
 
 
@@ -213,6 +234,7 @@ function gameOver(){
   createGrid(startingPosition)
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   rotateBtn.addEventListener('click', rotate)
+  setPositionBtn.addEventListener('click', saveShipPosition)
 
 }
 
