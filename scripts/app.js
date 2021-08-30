@@ -87,13 +87,9 @@ function init() {
         singleShipCoordinates.push(i)                                                         // saves ship divs as an array 
       }
     }
-    console.log('addship ssc', singleShipCoordinates)
     if (save === true){                      // saves singleShipCoordinates into an array with other ships
-      console.log('addship before push', shipCoordinates)
       shipCoordinates.push(singleShipCoordinates)
-      console.log('add ship save true after push, shipCoordinates => ', shipCoordinates)
       singleShipCoordinates.forEach(value => allCoordinates.push(value))
-      console.log('allcoord ', allCoordinates)
     }
   }
 
@@ -132,9 +128,6 @@ function init() {
 
 
   function isSpaceOccupied(cellPosition){
-    console.log('ISP cellPosition ->', cellPosition)
-    console.log('ISP allCoordinates ->', allCoordinates)
-    console.log('ISP allCordinate.indexOf(cellPosition) ->', allCoordinates.indexOf(cellPosition))
     if (allCoordinates.indexOf(cellPosition) > -1){
       return true
     } else {
@@ -143,9 +136,7 @@ function init() {
   }
 
   function shipOverlaps(singleShipCoordinates){
-    console.log('shipoverlaps ssc ', singleShipCoordinates)
     for (let i = 0; i < singleShipCoordinates.length; i++){
-      console.log('shipoverlaps isspaceoccupied and input ', isSpaceOccupied(singleShipCoordinates[i]), singleShipCoordinates[i])
       if (isSpaceOccupied(singleShipCoordinates[i]) === true){
         return true
       }
@@ -159,7 +150,6 @@ function init() {
     removeShip(currentPosition, currentShipSize, isVertical)
 
     const key = event.keyCode
-    console.log(event.keyCode)
 
     if (isVertical === false){
       if (key === right && (currentPosition + currentShipSize - 1) % width !== width - 1){
@@ -173,7 +163,6 @@ function init() {
       } else {
         console.log('INVALID KEY')
       }
-      console.log('current position ->',currentPosition)
       addShip(currentPosition, currentShipSize, isVertical)
     } else {
       if (key === right && currentPosition % width !== width - 1){
@@ -187,7 +176,6 @@ function init() {
       } else {
         console.log('INVALID KEY')
       }
-      console.log('current position ->',currentPosition)
       addShip(currentPosition, currentShipSize, isVertical)
     }
   } 
@@ -205,10 +193,7 @@ function init() {
   }
 
   function saveShipPosition(event){
-    console.log('saveshipposition ssc ', singleShipCoordinates)
-    console.log('saveshipposition shipoverlaps ', shipOverlaps(singleShipCoordinates) )
     if (shipOverlaps(singleShipCoordinates) === false){
-      console.log('saveshipposition passed check')
       addShip(currentPosition, currentShipSize, isVertical, true)
       removeShip(currentPosition, currentShipSize, isVertical)
       rotateBtn.removeEventListener('click', rotate)
@@ -216,10 +201,10 @@ function init() {
       currentShipButton.classList.add(shipDisappear)
     }
     // start game button appears once all ships set
-    const startBtn = document.createElement('button')
-    startBtn.innerText = 'Start Game'
-    startBtn.classList.add(startButton)
     if (shipCoordinates.length === 5){
+      const startBtn = document.createElement('button')
+      startBtn.innerText = 'Start Game'
+      startBtn.classList.add(startButton)
       scoreBoard.appendChild(startBtn)
     }
   }
@@ -238,11 +223,10 @@ function init() {
     // upon game start button being pressed -> randomly place ships for computer
     // use array to store ships position for future checks
     // change cursor to crosshair
-    const startButton = startButton
 
-    if (document.getElementById('startBtn').clicked === true){
-      alert('AVENGERS ASSEMBLE')
-    }
+    // if (document.querySelector('start-button').clicked === true){
+    //   alert('AVENGERS ASSEMBLE')
+    // }
 
 
 
@@ -286,6 +270,9 @@ function gameOver(){
   createGrid(startingPosition)
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   setPositionBtn.addEventListener('click', saveShipPosition)
+
+
+
   startButton.addEventListener('click', gameStart)
 }
 
