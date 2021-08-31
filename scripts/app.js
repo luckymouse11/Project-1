@@ -19,13 +19,15 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
-  const shipCoordinates = []
-  const allCoordinates = []
+  const shipCoordinates = []                // player ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const allCoordinates = []                 // player ships div numbers eg. [1, 2, 25, 35, 45]
+  const compShipCoordinates = []            // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
 
   const shipInPosition = 'ship-in-position' // css class for ship set in position
   const ship = 'ship'                       // css class for the pieces
   const startButton = 'start-button'
-  const shipDisappear = 'button-disappear'
+  const shipDisappear = 'button-disappear'  //css to make buttons disappear upon ship being placed
   const shipSizes = {                       // ship size (how many divs each take)
     'Ship 1': 6,
     'Ship 2': 5,
@@ -70,26 +72,30 @@ function init() {
   }
 
 
-  function addShip(cellPosition, shipSize, isVertical, save = false){
-    let shipClass = ship
-    if (save === true){                                                                       
-      shipClass = shipInPosition
-    }
+  function addShip(cellPosition, shipSize, isVertical, save = false, computerBoard = false){
+    const shipClass = save === true ? shipInPosition : ship
+    const shipArray = computerBoard === true ? compShipCoordinates : shipCoordinates
+    const divArray = computerBoard === true ? compAllCoordinates : allCoordinates
+
     singleShipCoordinates = []
     if (isVertical === true){
       for (let i = cellPosition; i <= cellPosition + width * (shipSize - 1); i += width){
-        playerBoard[i].classList.add(shipClass)
+        if (computerBoard === false){
+          playerBoard[i].classList.add(shipClass)
+        }
         singleShipCoordinates.push(i)                                                         // saves ship divs as an array 
       }  
     } else if (isVertical !== true){ 
       for (let i = cellPosition; i < cellPosition + shipSize; i++){
-        playerBoard[i].classList.add(shipClass)
+        if (computerBoard === false){
+          playerBoard[i].classList.add(shipClass)
+        }
         singleShipCoordinates.push(i)                                                         // saves ship divs as an array 
       }
     }
-    if (save === true){                      // saves singleShipCoordinates into an array with other ships
-      shipCoordinates.push(singleShipCoordinates)
-      singleShipCoordinates.forEach(value => allCoordinates.push(value))
+    if (save === true){                                                                       // saves singleShipCoordinates into an array with other ships
+      shipArray.push(singleShipCoordinates)
+      singleShipCoordinates.forEach(value => divArray.push(value))
     }
   }
 
@@ -127,17 +133,18 @@ function init() {
   }
 
 
-  function isSpaceOccupied(cellPosition){
-    if (allCoordinates.indexOf(cellPosition) > -1){
+  function isSpaceOccupied(cellPosition, computerBoard){
+    const coordinatesArray = computerBoard === true ? compAllCoordinates : allCoordinates
+    if (coordinatesArray.indexOf(cellPosition) > -1){
       return true
     } else {
       return false
     }
   }
 
-  function shipOverlaps(singleShipCoordinates){
+  function shipOverlaps(singleShipCoordinates, computerBoard = false){
     for (let i = 0; i < singleShipCoordinates.length; i++){
-      if (isSpaceOccupied(singleShipCoordinates[i]) === true){
+      if (isSpaceOccupied(singleShipCoordinates[i], computerBoard) === true){
         return true
       }
     }
@@ -200,14 +207,14 @@ function init() {
       document.removeEventListener('keydown', handleKeyDown)
       currentShipButton.classList.add(shipDisappear)
     }
-    // start game button appears once all ships set
-    if (shipCoordinates.length === 5){
-      const startBtn = document.createElement('button')
-      startBtn.innerText = 'Start Game'
-      startBtn.classList.add(startButton)
-      scoreBoard.appendChild(startBtn)
-    }
+    const startBtn = document.createElement('button')
+    startBtn.setAttribute('id', 'start-button')
+    startBtn.innerText = 'Start Game'
+    startBtn.classList.add(startButton)
+    scoreBoard.appendChild(startBtn)
+    startBtn.addEventListener('click', gameStart)
   }
+
 
   // function to reset the board
   function reset(event){
@@ -219,21 +226,59 @@ function init() {
 
 
   function gameStart(){
-    // clear buttons
-    // upon game start button being pressed -> randomly place ships for computer
-    // use array to store ships position for future checks
-    // change cursor to crosshair
 
-    // if (document.querySelector('start-button').clicked === true){
-    //   alert('AVENGERS ASSEMBLE')
-    // }
+    const shipPlacement = document.getElementById('ship-placement')
+    const rotateButton = document.getElementById('rotate-btn')
+    const setPositionButton = document.getElementById('set-position-btn')
+    const resetButton = document.getElementById('reset-btn')
+    const startButton = document.getElementById('start-button')
+    // const buttonsToRemove = ['ship-placement', 'rotate-btn', 'set-position-btn', 'reset-btn', 'start-btn']
+    // buttonsToRemove.forEach(btn => document.getElementById(btn).parentNode.removeChild(document.getElementById(btn)))
+    shipPlacement.parentNode.removeChild(shipPlacement)
+    rotateButton.parentNode.removeChild(rotateButton)
+    setPositionButton.parentNode.removeChild(setPositionButton)
+    resetButton.parentNode.removeChild(resetButton)
+    startButton.parentNode.removeChild(startButton)
+    alert('AVENGERS ASSEMBLE')
+
+    isVertical = (Math.random() > 0.5 ? true : false)
+    currentPosition = Math.floor(Math.random() * 100)
+
+    for (const [key, value] of Object.entries(shipSizes)) {
+      let invalidPosition = false
+      currentShipSize = value
+
+      do {
+        isVertical = (Math.random() > 0.5 ? true : false)
+        currentPosition = Math.floor(Math.random() * 100)
+        invalidPosition = isInvalidShipPosition()    
+        addShip(currentPosition, currentShipSize, isVertical, false, true)
+        console.log(singleShipCoordinates)
+      }
+      while (invalidPosition === true || shipOverlaps(singleShipCoordinates, true) === true)
+      addShip(currentPosition, currentShipSize, isVertical, true, true)
+    }
+  }
+
+
+  function isInvalidShipPosition(){
+    if (isVertical === false){
+      if ((currentPosition % 10) > width - currentShipSize){
+        return true
+      } else {
+        return false
+      }
+    } else {
+      if (currentPosition > (width - currentShipSize) * width + (width - 1)){
+        return true
+      } else {
+        return false
+      }
+    }
+  }
 
 
 
-
-
-
-}
 
 function shoot(){
   // click square on grid - run check for ship
@@ -271,9 +316,6 @@ function gameOver(){
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   setPositionBtn.addEventListener('click', saveShipPosition)
 
-
-
-  startButton.addEventListener('click', gameStart)
 }
 
 window.addEventListener('DOMContentLoaded', init)
