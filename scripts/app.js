@@ -19,9 +19,9 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
-  const shipCoordinates = []                // player ships div arrays eg. [[1, 2], [25, 35, 45]]
+  let shipCoordinates = []                // player ships div arrays eg. [[1, 2], [25, 35, 45]]
   const allCoordinates = []                 // player ships div numbers eg. [1, 2, 25, 35, 45]
-  const compShipCoordinates = []            // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
+  let compShipCoordinates = []            // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
   const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
 
   const shipInPosition = 'ship-in-position' // css class for ship set in position
@@ -42,7 +42,9 @@ function init() {
   let currentShipSize = 0
   let currentShipButton 
   let playerSpaceOccupied = 0 //number      // counter for space occupied on player board - if time, can create for total number of ships
-  let computerSpaceOccupied                 // counter for space occupied on computer board
+  let enemySpaceOccupied                    // divs occupied on enemy grid
+  let enemyShipsRemaining                   // enemy ships remaining
+  
   let playerSpaceHit                        // counter for ships that have been hit
   let computerSpaceHit                      // counter for enemy ships remaining
   let totalShotsTaken                       // counter for shots taken
@@ -200,6 +202,7 @@ function init() {
   }
 
   function saveShipPosition(event){
+    
     if (shipOverlaps(singleShipCoordinates) === false){
       addShip(currentPosition, currentShipSize, isVertical, true)
       removeShip(currentPosition, currentShipSize, isVertical)
@@ -207,12 +210,14 @@ function init() {
       document.removeEventListener('keydown', handleKeyDown)
       currentShipButton.classList.add(shipDisappear)
     }
-    const startBtn = document.createElement('button')
-    startBtn.setAttribute('id', 'start-button')
-    startBtn.innerText = 'Start Game'
-    startBtn.classList.add(startButton)
-    scoreBoard.appendChild(startBtn)
-    startBtn.addEventListener('click', gameStart)
+    if (shipCoordinates.length === 5){
+      const startBtn = document.createElement('button')
+      startBtn.setAttribute('id', 'start-button')
+      startBtn.innerText = 'Start Game'
+      startBtn.classList.add(startButton)
+      scoreBoard.appendChild(startBtn)
+      startBtn.addEventListener('click', gameStart)
+    }
   }
 
 
@@ -277,20 +282,37 @@ function init() {
     }
   }
 
+  function updateScoreBoard(){
+    // Enemy space occupied
+    // Enemy ships remaining
+    // Total shots taken
+    
+  }
 
 
 
-function shoot(){
-  // click square on grid - run check for ship
-      // if ship is hit -> then remove + add explosion 
-          // have all occupied space been hit?
-          // yes = gameOver
-          // no = go again 
-      // else add cross for miss -> computers turn
+  function playerTurn(event){
+    // click square on grid - run check for ship
+        // if ship is hit -> then remove + add explosion 
+            // have all occupied space been hit?
+            // yes = gameOver
+            // no = go again 
+        // else add cross for miss -> computers turn
+    const targetDiv = event.target.innerText
+    const targetIndex = compAllCoordinates.indexOf(targetDiv)       
+    if (targetIndex > -1){                                       // if target div doesn't exist in compAllCoordinates, indexof returns -1 else returns indexof targetDiv
+
+    }
+
+  }
+
+function computerTurn(){
   // random select square for computer shot
       // if ship then remove + add explosion -> go again, else remove + add cross for miss
           // upon occupied space being hit -> create an array around the "hit" -> next turn targets this array
           // if miss then reset target area
+
+
 }
 
 function gameOver(){
