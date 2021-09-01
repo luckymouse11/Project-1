@@ -125,3 +125,11 @@ button{
 .ship-btn{
   height: 100%;
 }
+
+.shot-hit{
+  background-color: red;
+}
+
+.shot-missed{
+  background-color: grey;
+}

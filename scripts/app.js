@@ -19,9 +19,9 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
-  let shipCoordinates = []                // player ships div arrays eg. [[1, 2], [25, 35, 45]]
+  let shipCoordinates = []                  // player ships div arrays eg. [[1, 2], [25, 35, 45]]
   const allCoordinates = []                 // player ships div numbers eg. [1, 2, 25, 35, 45]
-  let compShipCoordinates = []            // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
+  let compShipCoordinates = []              // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
   const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
 
   const shipInPosition = 'ship-in-position' // css class for ship set in position
@@ -36,7 +36,7 @@ function init() {
     'Ship 5': 2
   }
   const startingPosition = 0                // cell starting position (where boat appears first)
-  let singleShipCoordinates = []          // markng a ships saved position
+  let singleShipCoordinates = []            // markng a ships saved position
   let isVertical = false
   let currentPosition = startingPosition    // current position which is updated on every move //shouldnt need this
   let currentShipSize = 0
@@ -48,6 +48,10 @@ function init() {
   let playerSpaceHit                        // counter for ships that have been hit
   let computerSpaceHit                      // counter for enemy ships remaining
   let totalShotsTaken                       // counter for shots taken
+
+  const shotHit = 'shot-hit'                // css for shots that hit
+  const shotMissed = 'shot-missed'          // css for shots that miss
+
 
 
   // EXECUTION
@@ -263,6 +267,10 @@ function init() {
       while (invalidPosition === true || shipOverlaps(singleShipCoordinates, true) === true)
       addShip(currentPosition, currentShipSize, isVertical, true, true)
     }
+    playerSpaceOccupied = allCoordinates.length
+    enemySpaceOccupied = compAllCoordinates.length
+    enemyShipsRemaining = compShipCoordinates.length
+    updateScoreBoard()
   }
 
 
@@ -283,10 +291,9 @@ function init() {
   }
 
   function updateScoreBoard(){
-    // Enemy space occupied
-    // Enemy ships remaining
+    document.getElementById('enemy-space-occupied').innerHTML = enemySpaceOccupied
+    document.getElementById('enemy-ships-remaining').innerHTML = enemyShipsRemaining
     // Total shots taken
-    
   }
 
 
@@ -298,45 +305,65 @@ function init() {
             // yes = gameOver
             // no = go again 
         // else add cross for miss -> computers turn
-    const targetDiv = event.target.innerText
-    const targetIndex = compAllCoordinates.indexOf(targetDiv)       
-    if (targetIndex > -1){                                       // if target div doesn't exist in compAllCoordinates, indexof returns -1 else returns indexof targetDiv
+    const targetDiv = parseFloat(event.target.innerText)
+    const targetIndex = compAllCoordinates.indexOf(targetDiv)
+    console.log('targetDiv ->', targetDiv)
+    console.log('targetIndex ->', targetIndex)
 
+    if (targetIndex > -1){                                                            // if target div doesn't exist in compAllCoordinates, indexof returns -1 else returns indexof targetDiv
+      enemySpaceOccupied -= 1
+      for (let i = 0; i < compShipCoordinates.length; i++){
+        const compShipCoordinatesIndex = compShipCoordinates[i].indexOf(targetDiv)    
+        if (compShipCoordinatesIndex > -1){
+          compShipCoordinates[i][compShipCoordinatesIndex] = 'x'                          // change element in compShipCoordinates array to 'x'
+          console.log('compshipcoordinates edited -> ', compShipCoordinates[i])
+          const compShipDestroyed = compShipCoordinates[i].every(value => value === 'x')
+          computerBoard[targetDiv].classList.add(shotHit)                             // update css of target div if shot hits - change to explosion gif if time
+          if (compShipDestroyed === true){
+            enemyShipsRemaining -= 1
+            if (enemyShipsRemaining === 0){
+              gameOver()
+            }
+          }
+          updateScoreBoard()
+        }
+      }
+    } else {
+      computerBoard[targetDiv].classList.add(shotMissed)                          // update css of target div if shot misses - change to cross if time
+      computerTurn()
     }
-
   }
 
-function computerTurn(){
-  // random select square for computer shot
-      // if ship then remove + add explosion -> go again, else remove + add cross for miss
-          // upon occupied space being hit -> create an array around the "hit" -> next turn targets this array
-          // if miss then reset target area
+  function computerTurn(){
+    // random select square for computer shot
+        // if ship then remove + add css -> go again, else remove + add cross for miss
+            // upon occupied space being hit -> create an array around the "hit" -> next turn targets this array
+            // if miss then reset target area
+    const compTarget = Math.floor(Math.random() * 100)
+    const compTargetIndex = allCoordinates.indexOf(compTarget)
+    console.log('compTarget ->', compTarget)
+    console.log('compTargetIndex ->', compTargetIndex)
 
+    if (compTargetIndex > -1){
+      playerSpaceOccupied -= 1
+      
+    }
+  }
 
-}
-
-function gameOver(){
-  // if computer ships all hit -> winner screen
-  // if player ships all hit -> loser screen
-  // alert message for win or lose -> ask to reset game
-}
+  function gameOver(){
+    // if computer ships all hit -> winner screen
+    // if player ships all hit -> loser screen
+    // alert message for win or lose -> ask to reset game
+    alert('PLAYER WINS!!! Game Over')
+  }
 
 
   // EVENT
 
-  // addEventListener - start game (to start adding ships)
-  // addEventListener - click to add ship 1
-  //                  - keys to rotate ship?
-  //                  - click to set position - make sure squares are no longer accessible (avoid overlap)
-  // repeat steps for ship 2 and ship 3
-  // addEventListener - button to start game -> adds 
-
-
-
-
   createGrid(startingPosition)
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   setPositionBtn.addEventListener('click', saveShipPosition)
+  computerBoard.forEach(btn => btn.addEventListener('click', playerTurn))
 
 }
 
