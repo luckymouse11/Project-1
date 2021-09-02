@@ -8,6 +8,13 @@ function init() {
   const shipButtons = document.querySelectorAll('.ship-btn')
   const rotateBtn = document.getElementById('rotate-btn')
   const setPositionBtn = document.getElementById('set-position-btn')
+  const backgroundAudio = document.getElementById('audio-background')
+  const gameStartAudio = document.getElementById('audio-gamestart')
+  const gunshotAudio = document.getElementById('audio-gunshot')
+  const enemyShipsDownAudio = document.getElementById('audio-enemy-ship-down')
+  const enemyGunshotAudio = document.getElementById('audio-gunshot')
+
+
 
 
   // VARIABLES
@@ -19,10 +26,11 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
-  let shipCoordinates = []                  // player ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const shipCoordinates = []                  // player ships div arrays eg. [[1, 2], [25, 35, 45]]
   const allCoordinates = []                 // player ships div numbers eg. [1, 2, 25, 35, 45]
-  let compShipCoordinates = []              // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const compShipCoordinates = []              // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
   const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
+  const compTargetLog = []
 
   const shipInPosition = 'ship-in-position' // css class for ship set in position
   const ship = 'ship'                       // css class for the pieces
@@ -40,14 +48,12 @@ function init() {
   let isVertical = false
   let currentPosition = startingPosition    // current position which is updated on every move //shouldnt need this
   let currentShipSize = 0
-  let currentShipButton 
-  let playerSpaceOccupied = 0 //number      // counter for space occupied on player board - if time, can create for total number of ships
-  let enemySpaceOccupied                    // divs occupied on enemy grid
-  let enemyShipsRemaining                   // enemy ships remaining
-  
-  let playerSpaceHit                        // counter for ships that have been hit
-  let computerSpaceHit                      // counter for enemy ships remaining
-  let totalShotsTaken                       // counter for shots taken
+  let currentShipButton = null
+  let playerSpaceOccupied = null            // counter for space occupied on player board - if time, can create for total number of ships
+  let enemySpaceOccupied = null             // divs occupied on enemy grid
+  let enemyShipsRemaining = null            // enemy ships remaining
+
+  let totalShotsTaken = 0                   // counter for shots taken
 
   const shotHit = 'shot-hit'                // css for shots that hit
   const shotMissed = 'shot-missed'          // css for shots that miss
@@ -56,7 +62,7 @@ function init() {
 
   // EXECUTION
 
-  function createGrid(startPos){
+  function createGrid(){
     for (let i = 0; i < cellCount; i++){
       const cell = document.createElement('div')
       cell.innerText = i
@@ -205,7 +211,7 @@ function init() {
     document.addEventListener('keydown', handleKeyDown)
   }
 
-  function saveShipPosition(event){
+  function saveShipPosition(){
     
     if (shipOverlaps(singleShipCoordinates) === false){
       addShip(currentPosition, currentShipSize, isVertical, true)
@@ -225,30 +231,20 @@ function init() {
   }
 
 
-  // function to reset the board
-  function reset(event){
-
-  }
-
-
-
-
-
   function gameStart(){
 
     const shipPlacement = document.getElementById('ship-placement')
     const rotateButton = document.getElementById('rotate-btn')
     const setPositionButton = document.getElementById('set-position-btn')
-    const resetButton = document.getElementById('reset-btn')
     const startButton = document.getElementById('start-button')
-    // const buttonsToRemove = ['ship-placement', 'rotate-btn', 'set-position-btn', 'reset-btn', 'start-btn']
-    // buttonsToRemove.forEach(btn => document.getElementById(btn).parentNode.removeChild(document.getElementById(btn)))
+
     shipPlacement.parentNode.removeChild(shipPlacement)
     rotateButton.parentNode.removeChild(rotateButton)
     setPositionButton.parentNode.removeChild(setPositionButton)
-    resetButton.parentNode.removeChild(resetButton)
     startButton.parentNode.removeChild(startButton)
     alert('AVENGERS ASSEMBLE')
+    gameStartAudio.src = `audio-gamestart/${Math.ceil(Math.random() * 2)}.mp3`
+    gameStartAudio.play()
 
     isVertical = (Math.random() > 0.5 ? true : false)
     currentPosition = Math.floor(Math.random() * 100)
@@ -293,74 +289,125 @@ function init() {
   function updateScoreBoard(){
     document.getElementById('enemy-space-occupied').innerHTML = enemySpaceOccupied
     document.getElementById('enemy-ships-remaining').innerHTML = enemyShipsRemaining
-    // Total shots taken
+    document.getElementById('total-shots').innerHTML = totalShotsTaken
   }
 
 
 
   function playerTurn(event){
-    // click square on grid - run check for ship
-        // if ship is hit -> then remove + add explosion 
-            // have all occupied space been hit?
-            // yes = gameOver
-            // no = go again 
-        // else add cross for miss -> computers turn
     const targetDiv = parseFloat(event.target.innerText)
     const targetIndex = compAllCoordinates.indexOf(targetDiv)
-    console.log('targetDiv ->', targetDiv)
-    console.log('targetIndex ->', targetIndex)
+    console.log('player turn targetDiv ->', targetDiv)
+    console.log('player turn targetIndex ->', targetIndex)
+    computerBoard[targetDiv].removeEventListener('click', playerTurn)
 
-    if (targetIndex > -1){                                                            // if target div doesn't exist in compAllCoordinates, indexof returns -1 else returns indexof targetDiv
+    gunshotAudio.src = `audio-shot/${Math.ceil(Math.random() * 4)}.mp3`
+    enemyShipsDownAudio.src = `audio-enemy-ship-down/${Math.ceil(Math.random() * 2)}.mp3`
+
+    totalShotsTaken += 1
+    if (targetIndex > -1){                                                                // if target div doesn't exist in compAllCoordinates, indexof returns -1 else returns indexof targetDiv
       enemySpaceOccupied -= 1
+      console.log('player turn - enemyspaceocc ', enemySpaceOccupied)
       for (let i = 0; i < compShipCoordinates.length; i++){
-        const compShipCoordinatesIndex = compShipCoordinates[i].indexOf(targetDiv)    
+        const compShipCoordinatesIndex = compShipCoordinates[i].indexOf(targetDiv)
+
         if (compShipCoordinatesIndex > -1){
+          computerBoard[targetDiv].classList.add(shotHit)                                 // update css of target div if shot hits - change to explosion gif if time
+          gunshotAudio.play()
           compShipCoordinates[i][compShipCoordinatesIndex] = 'x'                          // change element in compShipCoordinates array to 'x'
           console.log('compshipcoordinates edited -> ', compShipCoordinates[i])
           const compShipDestroyed = compShipCoordinates[i].every(value => value === 'x')
-          computerBoard[targetDiv].classList.add(shotHit)                             // update css of target div if shot hits - change to explosion gif if time
+
           if (compShipDestroyed === true){
+            console.log('player turn ship destroyed')
             enemyShipsRemaining -= 1
-            if (enemyShipsRemaining === 0){
-              gameOver()
-            }
+            console.log('player turn enemyshipsremaining ', enemyShipsRemaining)
+            enemyShipsDownAudio.play()
           }
-          updateScoreBoard()
+          break
         }
       }
+      updateScoreBoard()
+      // sleep for 1000ms
+      if (enemyShipsRemaining === 0){
+        gameOver(true)
+        return
+      }
     } else {
-      computerBoard[targetDiv].classList.add(shotMissed)                          // update css of target div if shot misses - change to cross if time
+      updateScoreBoard()
+      computerBoard[targetDiv].classList.add(shotMissed)                                  // update css of target div if shot misses - change to cross if time
+      // sleep(3000)
       computerTurn()
     }
   }
 
-  function computerTurn(){
-    // random select square for computer shot
-        // if ship then remove + add css -> go again, else remove + add cross for miss
-            // upon occupied space being hit -> create an array around the "hit" -> next turn targets this array
-            // if miss then reset target area
-    const compTarget = Math.floor(Math.random() * 100)
-    const compTargetIndex = allCoordinates.indexOf(compTarget)
-    console.log('compTarget ->', compTarget)
-    console.log('compTargetIndex ->', compTargetIndex)
+  
+//let potentialTargets = []
 
-    if (compTargetIndex > -1){
-      playerSpaceOccupied -= 1
-      
+  // function generatePotentialTargets(cellPosition){
+  // // clear previous entries
+  // potentialTargets = []
+  // // +1, -1, +10, -10 
+
+  // // if has been hit, do not include
+  // }
+
+  function computerTurn(){
+
+    let compTarget = null
+    let compTargetIndex = null
+    let continueTurn = true
+    
+    do {
+      compTarget = Math.floor(Math.random() * 100)
+      // check if compTarget has previously been hit
+      // if yes, skip 'if' and rerun 'do' loop
+      if (compTargetLog.indexOf(compTarget) === -1) {
+        compTargetLog.push(compTarget)
+        compTargetIndex = allCoordinates.indexOf(compTarget)
+        enemyGunshotAudio.src = `audio-shot/${Math.ceil(Math.random() * 4)}.mp3`
+        
+        // if compTarget is part of a ship
+        if (compTargetIndex > -1) {
+          playerSpaceOccupied -= 1
+          playerBoard[compTarget].classList.add(shotHit)
+          enemyGunshotAudio.play()
+
+          // check if all ships cells have been hit -> if yes, computer wins
+          if (playerSpaceOccupied === 0) {
+            gameOver(false)
+            return
+          }
+        } else {
+          // if shot missed, end computer's turn
+          continueTurn = false
+          playerBoard[compTarget].classList.add(shotMissed)
+          enemyGunshotAudio.play()
+        }
+      }
+    } while (continueTurn)
+  }
+
+  function gameOver(playerWins){
+    if (playerWins === true){
+      setTimeout(alert('PLAYER WINS!!! Game Over'), 2000)
+    } else {
+      // thanos finger snap gif
+      setTimeout(alert('COMPUTER WINS..........'), 2000)
     }
   }
 
-  function gameOver(){
-    // if computer ships all hit -> winner screen
-    // if player ships all hit -> loser screen
-    // alert message for win or lose -> ask to reset game
-    alert('PLAYER WINS!!! Game Over')
+  function sleep(milliseconds){
+    const date = Date.now()
+    let currentDate = null
+    do {
+      currentDate = Date.now()
+    } while (currentDate - date < milliseconds)
   }
-
-
+  
   // EVENT
 
-  createGrid(startingPosition)
+  createGrid()
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   setPositionBtn.addEventListener('click', saveShipPosition)
   computerBoard.forEach(btn => btn.addEventListener('click', playerTurn))
