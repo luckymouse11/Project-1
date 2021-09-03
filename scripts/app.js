@@ -318,7 +318,7 @@ function init() {
         const compShipCoordinatesIndex = compShipCoordinates[i].indexOf(targetDiv)
 
         if (compShipCoordinatesIndex > -1){
-          computerBoard[targetDiv].classList.add(shotHit)                                 // update css of target div if shot hits - change to explosion gif if time
+          computerBoard[targetDiv].classList.add(shotHit)                                 // update css to gif, if time
           gunshotAudio.play()
           compShipCoordinates[i][compShipCoordinatesIndex] = 'x'                          // change element in compShipCoordinates array to 'x'
           console.log('compshipcoordinates edited -> ', compShipCoordinates[i])
@@ -341,7 +341,7 @@ function init() {
       }
     } else {
       updateScoreBoard()
-      computerBoard[targetDiv].classList.add(shotMissed)                                  // update css of target div if shot misses - change to cross if time
+      computerBoard[targetDiv].classList.add(shotMissed)                                // update css to gif, if time
       gunshotMissAudio.play()
       // sleep(3000)
       computerTurn()
