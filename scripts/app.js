@@ -1,7 +1,7 @@
 function init() {
 
   // ELEMENTS
-
+  const introPage = document.querySelector('.intro')
   const playerGrid = document.querySelector('.player-grid')
   const computerGrid = document.querySelector('.computer-grid')
   const scoreBoard = document.querySelector('.player-score')
@@ -13,8 +13,7 @@ function init() {
   const gunshotAudio = document.getElementById('audio-gunshot')
   const enemyShipsDownAudio = document.getElementById('audio-enemy-ship-down')
   const enemyGunshotAudio = document.getElementById('audio-gunshot')
-
-
+  const gunshotMissAudio = document.getElementById('audio-gunshot-miss')
 
 
   // VARIABLES
@@ -32,6 +31,7 @@ function init() {
   const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
   const compTargetLog = []
 
+  const intro = 'intro'
   const shipInPosition = 'ship-in-position' // css class for ship set in position
   const ship = 'ship'                       // css class for the pieces
   const startButton = 'start-button'
@@ -79,8 +79,10 @@ function init() {
 
 
   function introScreen() {
-    // display none -> remove intro page
-    // when button clicked, display none
+    introPage.classList.remove(intro)
+    backgroundAudio.src = 'audio-background/1.mp3'
+    backgroundAudio.play()
+    backgroundAudio.volume = 0.3
   }
 
 
@@ -293,7 +295,6 @@ function init() {
   }
 
 
-
   function playerTurn(event){
     const targetDiv = parseFloat(event.target.innerText)
     const targetIndex = compAllCoordinates.indexOf(targetDiv)
@@ -302,6 +303,7 @@ function init() {
     computerBoard[targetDiv].removeEventListener('click', playerTurn)
 
     gunshotAudio.src = `audio-shot/${Math.ceil(Math.random() * 4)}.mp3`
+    gunshotMissAudio.src = 'audio-miss/1.mp3'
     enemyShipsDownAudio.src = `audio-enemy-ship-down/${Math.ceil(Math.random() * 2)}.mp3`
 
     totalShotsTaken += 1
@@ -336,6 +338,7 @@ function init() {
     } else {
       updateScoreBoard()
       computerBoard[targetDiv].classList.add(shotMissed)                                  // update css of target div if shot misses - change to cross if time
+      gunshotMissAudio.play()
       // sleep(3000)
       computerTurn()
     }
@@ -366,6 +369,7 @@ function init() {
         compTargetLog.push(compTarget)
         compTargetIndex = allCoordinates.indexOf(compTarget)
         enemyGunshotAudio.src = `audio-shot/${Math.ceil(Math.random() * 4)}.mp3`
+        gunshotMissAudio.src = 'audio-miss/1.mp3'
         
         // if compTarget is part of a ship
         if (compTargetIndex > -1) {
@@ -382,7 +386,7 @@ function init() {
           // if shot missed, end computer's turn
           continueTurn = false
           playerBoard[compTarget].classList.add(shotMissed)
-          enemyGunshotAudio.play()
+          gunshotMissAudio.play()
         }
       }
     } while (continueTurn)
@@ -407,11 +411,11 @@ function init() {
   
   // EVENT
 
+  introPage.addEventListener('click', introScreen)
   createGrid()
   shipButtons.forEach(btn => btn.addEventListener('click', setShipPosition))
   setPositionBtn.addEventListener('click', saveShipPosition)
   computerBoard.forEach(btn => btn.addEventListener('click', playerTurn))
-
 }
 
 window.addEventListener('DOMContentLoaded', init)
