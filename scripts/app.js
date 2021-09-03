@@ -8,6 +8,7 @@ function init() {
   const shipButtons = document.querySelectorAll('.ship-btn')
   const rotateBtn = document.getElementById('rotate-btn')
   const setPositionBtn = document.getElementById('set-position-btn')
+  const gameInstructions = document.getElementById('game-instructions')
   const backgroundAudio = document.getElementById('audio-background')
   const gameStartAudio = document.getElementById('audio-gamestart')
   const gunshotAudio = document.getElementById('audio-gunshot')
@@ -238,12 +239,15 @@ function init() {
     const shipPlacement = document.getElementById('ship-placement')
     const rotateButton = document.getElementById('rotate-btn')
     const setPositionButton = document.getElementById('set-position-btn')
+    const gameInstructions = document.getElementById('game-instructions')
     const startButton = document.getElementById('start-button')
 
     shipPlacement.parentNode.removeChild(shipPlacement)
     rotateButton.parentNode.removeChild(rotateButton)
     setPositionButton.parentNode.removeChild(setPositionButton)
+    gameInstructions.parentNode.removeChild(gameInstructions)
     startButton.parentNode.removeChild(startButton)
+
     alert('AVENGERS ASSEMBLE')
     gameStartAudio.src = `audio-gamestart/${Math.ceil(Math.random() * 2)}.mp3`
     gameStartAudio.play()
@@ -392,22 +396,25 @@ function init() {
     } while (continueTurn)
   }
 
+
+  //game over sequence still having timing issues
   function gameOver(playerWins){
     if (playerWins === true){
       setTimeout(alert('PLAYER WINS!!! Game Over'), 2000)
     } else {
-      // thanos finger snap gif
       setTimeout(alert('COMPUTER WINS..........'), 2000)
     }
   }
 
-  function sleep(milliseconds){
-    const date = Date.now()
-    let currentDate = null
-    do {
-      currentDate = Date.now()
-    } while (currentDate - date < milliseconds)
-  }
+
+
+  // function sleep(milliseconds){
+  //   const date = Date.now()
+  //   let currentDate = null
+  //   do {
+  //     currentDate = Date.now()
+  //   } while (currentDate - date < milliseconds)
+  // }
   
   // EVENT
 
