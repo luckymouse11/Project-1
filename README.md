@@ -17,13 +17,9 @@ To build a functioning browser game using Vanilla JavaScript.
 ## Technologies Used:
 
 - HTML5
-
 - CSS3
-
 - JavaScript
-
 - Git
-
 
 ## Process
 ### Planning
