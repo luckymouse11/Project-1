@@ -26,9 +26,9 @@ function init() {
   const cellCount = width * width           // total cell count 
   const playerBoard = []                    // empty array that will contain all the grid cells once created
   const computerBoard = []                  // empty array that will contain grid cells for computer board
-  const shipCoordinates = []                  // player ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const shipCoordinates = []                // player ships div arrays eg. [[1, 2], [25, 35, 45]]
   const allCoordinates = []                 // player ships div numbers eg. [1, 2, 25, 35, 45]
-  const compShipCoordinates = []              // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
+  const compShipCoordinates = []            // computer ships div arrays eg. [[1, 2], [25, 35, 45]]
   const compAllCoordinates = []             // computer ships div numbers eg. [1, 2, 25, 35, 45]
   const compTargetLog = []
 
